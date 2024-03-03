@@ -2,16 +2,19 @@
 // headers
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: GET");
+// allow GET, POST, PUT, DELETE methods
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
 
 // include database and object files
 include_once '../includes/db_connection.php';
 
 // instantiate user object
 include_once '../core/user.php';
-
 $user = new User($db);
 
+
+// get request method
+if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 // query users
 $stmt = $user->read();
 $num = $stmt->rowCount();
@@ -30,7 +33,6 @@ if ($num > 0) {
         $user_item = array(
             "id" => $id,
             "username" => $username,
-            "password" => $password,
             "email" => $email,
             "shipping_address" => $shipping_address
         );
@@ -51,6 +53,7 @@ if ($num > 0) {
     echo json_encode(
         array("message" => "No users found.")
     );
+}
 }
 
 ?>
