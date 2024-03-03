@@ -28,6 +28,33 @@ class User {
 
         return $stmt;
     }
+
+    public function create() {
+        // query to insert record
+        $query = "INSERT INTO " . $this->table_name . " SET username=:username, password=:password, email=:email, shipping_address=:shipping_address";
+
+        // prepare query
+        $stmt = $this->conn->prepare($query);
+
+        // sanitize
+        $this->username = htmlspecialchars(strip_tags($this->username));
+        $this->password = md5(htmlspecialchars(strip_tags($this->password)));
+        $this->email = htmlspecialchars(strip_tags($this->email));
+        $this->shipping_address = htmlspecialchars(strip_tags($this->shipping_address));
+
+        // bind values
+        $stmt->bindParam(":username", $this->username);
+        $stmt->bindParam(":password", $this->password);
+        $stmt->bindParam(":email", $this->email);
+        $stmt->bindParam(":shipping_address", $this->shipping_address);
+
+        // execute query
+        if ($stmt->execute()) {
+            return true;
+        }
+
+        return false;
+    }
 }
 
 ?>

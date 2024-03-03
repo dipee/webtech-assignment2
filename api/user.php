@@ -55,5 +55,43 @@ if ($num > 0) {
     );
 }
 }
+if($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // get posted data from _POST
+    $data = json_decode(file_get_contents("php://input"));
 
+    // set user property values
+    $user->username = $data->username;
+    $user->password = $data->password;
+    $user->email = $data->email;
+    $user->shipping_address = $data->shipping_address;
+
+    // validate all fields are mandatory
+    if (empty($user->username) || empty($user->password) || empty($user->email) || empty($user->shipping_address)) {
+        // set response code - 400 bad request
+        http_response_code(400);
+
+        // tell the user
+        echo json_encode(array("message" => "Unable to create user. Data is incomplete."));
+        return;
+    }
+
+    // create the user
+    if ($user->create()) {
+        // set response code - 201 created
+        http_response_code(201);
+
+        // tell the user
+        echo json_encode(array("message" => "User was created."));
+    } else {
+        // set response code - 500 internal server error
+        http_response_code(500);
+
+        // tell the user
+        echo json_encode(array("message" => "Unable to create user."));
+    }
+
+    // close the database connection
+    $db = null;
+
+}
 ?>
