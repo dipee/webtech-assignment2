@@ -142,4 +142,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'PATCH') {
         echo json_encode(array("message" => "Unable to update user."));
     }
 }
+
+if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
+
+
+    $user->setUserById($_GET['id']);
+
+    if($user->id == null) {
+        // set response code - 404 Not found
+        http_response_code(404);
+
+        // tell the user
+        echo json_encode(array("message" => "User not found."));
+        return;
+    }
+
+    // delete the user
+    if ($user->delete()) {
+        // set response code - 200 OK
+        http_response_code(200);
+
+        // tell the user
+        echo json_encode(array("message" => "User was deleted."));
+    } else {
+        // set response code - 503 service unavailable
+        http_response_code(503);
+
+        // tell the user
+        echo json_encode(array("message" => "Unable to delete user."));
+    }
+}
 ?>
