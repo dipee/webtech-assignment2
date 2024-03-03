@@ -3,7 +3,7 @@
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 // allow GET, POST, PUT, DELETE methods
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE");
+header("Access-Control-Allow-Methods: GET, POST, PATCH, DELETE");
 
 // include database and object files
 include_once '../includes/db_connection.php';
@@ -15,6 +15,7 @@ $user = new User($db);
 
 // get request method
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+   
 // query users
 $stmt = $user->read();
 $num = $stmt->rowCount();
@@ -89,9 +90,56 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         // tell the user
         echo json_encode(array("message" => "Unable to create user."));
     }
-
+    
+    
+    
     // close the database connection
     $db = null;
 
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'PATCH') {
+    // get user id
+    parse_str(file_get_contents("php://input"), $_PATCH);
+
+    $data = json_decode(file_get_contents("php://input"));
+    
+    $user->setUserById($_GET['id']);
+    
+
+    if($user->id == null) {
+        // set response code - 404 Not found
+        http_response_code(404);
+
+        // tell the user
+        echo json_encode(array("message" => "User not found."));
+        return;
+    }
+
+    // set user property values if they are set
+    if (!empty($data->username)) {
+        $user->username = $data->username;
+    }
+    if (!empty($data->email)) {
+        $user->email = $data->email;
+    }
+    if (!empty($data->shipping_address)) {
+        $user->shipping_address = $data->shipping_address;
+    }
+
+    // update the user
+    if ($user->update()) {
+        // set response code - 200 OK
+        http_response_code(200);
+
+        // tell the user
+        echo json_encode(array("message" => "User was updated."));
+    } else {
+        // set response code - 503 service unavailable
+        http_response_code(503);
+
+        // tell the user
+        echo json_encode(array("message" => "Unable to update user."));
+    }
 }
 ?>

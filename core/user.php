@@ -55,6 +55,54 @@ class User {
 
         return false;
     }
+
+    // API for update user
+    public function update() {
+       
+        
+        // update query
+        $query = "UPDATE " . $this->table_name . " SET username=:username, email=:email, shipping_address=:shipping_address WHERE id=:id";
+
+        // prepare query statement
+        $stmt = $this->conn->prepare($query);
+
+        // sanitize
+        $this->username = htmlspecialchars(strip_tags($this->username));
+        $this->email = htmlspecialchars(strip_tags($this->email));
+        $this->shipping_address = htmlspecialchars(strip_tags($this->shipping_address));
+
+        // bind new values
+        $stmt->bindParam(":username", $this->username);
+        $stmt->bindParam(":email", $this->email);
+        $stmt->bindParam(":shipping_address", $this->shipping_address);
+        $stmt->bindParam(":id", $this->id);
+
+        // execute the query
+        if ($stmt->execute()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function setUserById($user_id) {
+     
+        // select all query
+        $query = "SELECT * FROM " . $this->table_name . " WHERE id =". $user_id;
+        // get user
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        $num = $stmt->rowCount();
+        // set properties of this class
+        if ($num > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $this->id = $row['id'];
+            $this->username = $row['username'];
+            $this->email = $row['email'];
+            $this->shipping_address = $row['shipping_address'];
+        }
+    }
+    
 }
 
 ?>
