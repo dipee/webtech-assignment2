@@ -147,5 +147,22 @@ class Product {
         }
       
     }
+
+    public function saveImage($image) {
+        $target_dir = "public/images/product/";
+        $target_file = $target_dir . basename($image["name"]);
+        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+        $extensions_arr = array("jpg", "jpeg", "png", "gif");
+
+        // check if image file is a actual image or fake image
+        $check = getimagesize($image["tmp_name"]);
+        if ($check !== false) {
+            if (in_array($imageFileType, $extensions_arr)) {
+                // upload image
+                move_uploaded_file($image["tmp_name"], $target_file);
+                return $target_file;
+            }
+        }
+    }
 }
 ?>
