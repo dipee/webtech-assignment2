@@ -172,4 +172,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
         echo json_encode(array("message" => "Unable to delete user."));
     }
 }
-?>

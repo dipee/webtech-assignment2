@@ -5,7 +5,7 @@ header("Content-Type: application/json; charset=UTF-8");
 // allow GET, POST, PUT, DELETE methods
 header("Access-Control-Allow-Methods: GET, POST, PATCH, DELETE");
 
-// include database and object files
+// include database files
 include_once '../includes/db_connection.php';
 
 // instantiate user object
@@ -53,6 +53,35 @@ if($_SERVER['REQUEST_METHOD'] == 'GET') {
         echo json_encode(
             array("message" => "No products found.")
         );
+    }
+}
+
+if($_SERVER['REQUEST_METHOD'] == 'POST') {
+  
+    // get posted data from _POST
+    $data = json_decode(file_get_contents("php://input"));
+
+    // set product property values
+    $product->name = $data->name;
+    $product->price = $data->price;
+    $product->description = $data->description;
+    $product->shipping_cost = $data->shipping_cost;
+    $product->image = $data->image;
+
+
+    // create the product
+    if($product->create()) {
+        // set response code - 201 created
+        http_response_code(201);
+
+        // tell the user
+        echo json_encode(array("message" => "Product was created."));
+    } else {
+        // set response code - 503 service unavailable
+        http_response_code(503);
+
+        // tell the user
+        echo json_encode(array("message" => "Unable to create product."));
     }
 }
 
