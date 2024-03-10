@@ -148,4 +148,12 @@ class Product {
       
     }
 
+    public function getComments(){
+        $query = "SELECT * FROM comment WHERE product_id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $this->id);
+        $stmt->execute();
+        return $stmt;
+    }
+
 }

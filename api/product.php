@@ -123,3 +123,24 @@ if($_SERVER['REQUEST_METHOD'] == 'PATCH') {
 }
 
 
+if($_SERVER['REQUEST_METHOD'] == 'DELETE') {
+
+    $product = new Product($db);
+    
+    $product->setProductById($_GET['id']);
+
+    if($product->id == null) {
+        http_response_code(404);
+        echo json_encode(array("message" => "Product not found."));
+        return;
+    }
+
+    if($product->delete()) {
+        http_response_code(200);
+        echo json_encode(array("message" => "Product was deleted."));
+    } else {
+        http_response_code(503);
+        echo json_encode(array("message" => "Unable to delete product."));
+    }
+}
+

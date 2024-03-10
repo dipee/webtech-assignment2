@@ -75,3 +75,57 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo json_encode(array("message" => "Unable to create comment."));
     }
 }
+
+if($_SERVER['REQUEST_METHOD'] == 'PATCH') {
+    $comment = new Comment($db);
+    // get posted data 
+    $data = json_decode(file_get_contents("php://input"));
+
+    $comment->setCommentById($_GET['id']);
+
+    if($comment->id == null) {
+        http_response_code(404);
+        echo json_encode(array("message" => "Comment not found."));
+        return;
+    }
+
+    // set comment property values if they are set 
+    if(isset($data->rating)) {
+        $comment->rating = $data->rating;
+    }
+    if(isset($data->image)) {
+        $comment->image = $data->image;
+    }
+    if(isset($data->text)) {
+        $comment->text = $data->text;
+    }
+
+    
+    if($comment->update()) {
+        http_response_code(200);
+        echo json_encode(array("message" => "Comment was updated."));
+    } else {
+        http_response_code(503);
+        echo json_encode(array("message" => "Unable to update comment."));
+    }
+}
+
+if($_SERVER['REQUEST_METHOD'] == 'DELETE') {
+    $comment = new Comment($db);
+    
+    $comment->setCommentById($_GET['id']);
+
+    if($comment->id == null) {
+        http_response_code(404);
+        echo json_encode(array("message" => "Comment not found."));
+        return;
+    }
+
+    if($comment->delete()) {
+        http_response_code(200);
+        echo json_encode(array("message" => "Comment was deleted."));
+    } else {
+        http_response_code(503);
+        echo json_encode(array("message" => "Unable to delete comment."));
+    }
+}
