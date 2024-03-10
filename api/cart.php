@@ -78,11 +78,14 @@ if($_SERVER['REQUEST_METHOD'] == 'PATCH') {
     $cart->user_id = $data->user_id;
     $cart->product_id = $data->product_id;
 
+    // ceck mandatory fields
+    if(empty($data->user_id) || empty($data->product_id)) {
+        http_response_code(400);
+        echo json_encode(array("message" => "Unable to update cart. Data is incomplete."));
+        return;
+    }
 
     // set cart property values if exists
-    if(isset($data->id)) {
-        $cart->id = $data->id;
-    }
     if(isset($data->user_id)) {
         $cart->user_id = $data->user_id;
     }
@@ -98,5 +101,23 @@ if($_SERVER['REQUEST_METHOD'] == 'PATCH') {
     } else {
         http_response_code(503);
         echo json_encode(array("message" => "Unable to update cart."));
+    }
+}
+
+
+if($_SERVER['REQUEST_METHOD'] == 'DELETE') {
+    $cart = new Cart($db);
+    // get posted data 
+    $data = json_decode(file_get_contents("php://input"));
+
+    $cart->user_id = $_GET['user_id'];
+    $cart->product_id = $_GET['product_id'];
+
+    if($cart->delete()) {
+        http_response_code(200);
+        echo json_encode(array("message" => "Cart was deleted."));
+    } else {
+        http_response_code(503);
+        echo json_encode(array("message" => "Unable to delete cart."));
     }
 }
