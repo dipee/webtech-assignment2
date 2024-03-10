@@ -9,7 +9,6 @@ header("Access-Control-Allow-Methods: GET, POST, PATCH, DELETE");
 include_once '../includes/db_connection.php';
 
 include_once '../core/cart.php';
-include_once '../core/cart_item.php';
 
 
 if($_SERVER['REQUEST_METHOD'] == 'GET') {
@@ -43,3 +42,30 @@ if($_SERVER['REQUEST_METHOD'] == 'GET') {
     
 }
 
+if($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $cart = new Cart($db);
+    // get posted data 
+    $data = json_decode(file_get_contents("php://input"));
+
+    // check mandatory fields 
+    if(empty($data->user_id) || empty($data->product_id) || empty($data->quantity)) {
+        http_response_code(400);
+        echo json_encode(array("message" => "Unable to create cart. Data is incomplete."));
+       return;
+    }
+    
+    // set cart property values
+    $cart->user_id = $data->user_id;
+    $cart->product_id = $data->product_id;
+    $cart->quantity = $data->quantity;
+
+    
+
+    if($cart->create()) {
+        http_response_code(201);
+        echo json_encode(array("message" => "Cart was created."));
+    } else {
+        http_response_code(503);
+        echo json_encode(array("message" => "Unable to create cart."));
+    }
+}
