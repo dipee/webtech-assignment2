@@ -8,22 +8,20 @@ header("Access-Control-Allow-Methods: GET, POST, PATCH, DELETE");
 // include database files
 include_once '../includes/db_connection.php';
 
-// instantiate user object
 include_once '../core/product.php';
-$product = new Product($db);
+
 
 if($_SERVER['REQUEST_METHOD'] == 'GET') {
+    $product = new Product($db);
     // query products
     $stmt = $product->read();
     $num = $stmt->rowCount();
 
     // check if more than 0 record found
     if ($num > 0) {
-        // products array
         $products_arr = array();
         $products_arr["records"] = array();
 
-        // retrieve table contents
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             // extract row
             extract($row);
@@ -40,16 +38,10 @@ if($_SERVER['REQUEST_METHOD'] == 'GET') {
             array_push($products_arr["records"], $product_item);
         }
 
-        // set response code - 200 OK
         http_response_code(200);
-
-        // show products data in json format
         echo json_encode($products_arr);
     } else {
-        // set response code - 404 Not found
         http_response_code(404);
-
-        // tell the user no products found
         echo json_encode(
             array("message" => "No products found.")
         );
@@ -57,8 +49,8 @@ if($_SERVER['REQUEST_METHOD'] == 'GET') {
 }
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
-  
-    // get posted data from _POST
+    $product = new Product($db);
+    // get posted data 
     $data = json_decode(file_get_contents("php://input"));
 
     // set product property values
@@ -68,20 +60,65 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
     $product->shipping_cost = $data->shipping_cost;
     $product->image = $data->image;
 
+    // validate all fields are mandatory
+    if (empty($product->name) || empty($product->price) || empty($product->description) || empty($product->shipping_cost) || empty($product->image)) {
+        http_response_code(400);
+        echo json_encode(array("message" => "All fields are mandatory."));
+        return;
+       
+    }
 
     // create the product
     if($product->create()) {
-        // set response code - 201 created
         http_response_code(201);
 
-        // tell the user
         echo json_encode(array("message" => "Product was created."));
     } else {
-        // set response code - 503 service unavailable
         http_response_code(503);
-
-        // tell the user
         echo json_encode(array("message" => "Unable to create product."));
+    }
+}
+
+if($_SERVER['REQUEST_METHOD'] == 'PATCH') {
+    $product = new Product($db);
+    $data = json_decode(file_get_contents("php://input"));
+    
+    $product->setProductById($_GET['id']);
+    
+
+    if($product->id == null) {
+
+        http_response_code(404);
+
+        echo json_encode(array("message" => "product not found."));
+        return;
+    }
+
+    // set product property values if they are set
+    if (!empty($data->name)) {
+        $product->name = $data->name;
+    }
+    if (!empty($data->image)) {
+        $product->image = $data->image;
+    }
+    if (!empty($data->price)) {
+        $product->price = $data->price;
+    }
+    if (!empty($data->description)) {
+        $product->description = $data->description;
+    }
+    if (!empty($data->shipping_cost)) {
+        $product->shipping_cost = $data->shipping_cost;
+    }
+
+    // update the product
+    if ($product->update()) {
+        http_response_code(200);
+
+        echo json_encode(array("message" => "Product was updated."));
+    } else {
+        http_response_code(503);
+        echo json_encode(array("message" => "Unable to update Product."));
     }
 }
 
