@@ -3,12 +3,12 @@ class Comment{
     private $conn;
     private $table_name = "comment";
 
-    private $id;
-    private $product_id;
-    private $user_id;
-    private $rating;
-    private $image;
-    private $text;
+    public $id;
+    public $product_id;
+    public $user_id;
+    public $rating;
+    public $image;
+    public $text;
 
     public function __construct($db) {
         $this->conn = $db;
