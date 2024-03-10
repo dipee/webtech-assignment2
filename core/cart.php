@@ -8,7 +8,11 @@ class Cart {
     public $id;
     public $user_id;
 
-    public $cart_items;
+    public $quantity;
+
+    public $product_id;
+
+
 
     public function __construct($db) {
         $this->conn = $db;
