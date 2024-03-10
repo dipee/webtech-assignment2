@@ -53,7 +53,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo json_encode(array("message" => "Unable to create cart. Data is incomplete."));
        return;
     }
-    
+
     // set cart property values
     $cart->user_id = $data->user_id;
     $cart->product_id = $data->product_id;
@@ -61,11 +61,42 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     
 
-    if($cart->create()) {
+    if($cart->createOrUpdate()) {
         http_response_code(201);
         echo json_encode(array("message" => "Cart was created."));
     } else {
         http_response_code(503);
         echo json_encode(array("message" => "Unable to create cart."));
+    }
+}
+
+if($_SERVER['REQUEST_METHOD'] == 'PATCH') {
+    $cart = new Cart($db);
+    // get posted data 
+    $data = json_decode(file_get_contents("php://input"));
+
+    $cart->user_id = $data->user_id;
+    $cart->product_id = $data->product_id;
+
+
+    // set cart property values if exists
+    if(isset($data->id)) {
+        $cart->id = $data->id;
+    }
+    if(isset($data->user_id)) {
+        $cart->user_id = $data->user_id;
+    }
+    if(isset($data->product_id)) {
+        $cart->product_id = $data->product_id;
+    }
+    if(isset($data->quantity)) {
+        $cart->quantity = $data->quantity;
+    }
+     if($cart->update()) {
+        http_response_code(200);
+        echo json_encode(array("message" => "Cart was updated."));
+    } else {
+        http_response_code(503);
+        echo json_encode(array("message" => "Unable to update cart."));
     }
 }
