@@ -1,7 +1,7 @@
 <?php
 
     // Connect to the database
-    $servername   = 'localhost'; // 127.0.0.1 // local machine
+    $servername   = 'localhost';
     $username     = 'root';
     $password     = '';
     $dbname       = 'ecom_asn2';

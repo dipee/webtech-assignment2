@@ -2,7 +2,6 @@
 // headers
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-// allow GET, POST, PUT, DELETE methods
 header("Access-Control-Allow-Methods: GET");
 
 // include database files
