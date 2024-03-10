@@ -12,6 +12,18 @@
     <h1>Simple E-Commerce CRUD API Documentation</h1>
     <p>This API allows you to perform CRUD operations (Create, Read, Update, Delete) data.</p>
 
-  
+    <h1>APIS</h1> 
+
+<h2>User</h2>
+
+<h3>{base_url}/api/user.php</h3>
+
+<ul>
+    <li>GET (Get all users)</li>
+    
+    <li>POST (Create new user)</li>
+    <li>PATCH (PARAM-id) (Update user)</li>
+    <li>DELTE (PARAM-id) (delete user)</li>
+</ul>
 </body>
 </html>
